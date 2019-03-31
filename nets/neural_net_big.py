@@ -6,8 +6,10 @@ from keras.layers import Dense
 from keras.models import model_from_json
 
 class NeuralNetworkBig:
-    pass
+    
 
+    def __init__(self):
+        pass
 
 
 df = pd.read_csv('dataset/dataset-big.csv')
