@@ -41,6 +41,8 @@ class NeuralNetworkBig:
 
             classifier.fit(self.X_train, self.y_train, batch_size=10, nb_epoch=100)
 
+            return classifier
+
         def predict(self):
             y_pred = classifier.predict(X_test)
             for index, item in enumerate(y_pred):
@@ -60,60 +62,26 @@ class NeuralNetworkBig:
                 if y_pred[i] == y_test[i]:
                     count = count+1
 
+            cm = confusion_matrix(y_test, y_pred)
 
 
-cm = confusion_matrix(y_test, y_pred)
-
-# Evalutation of Model
-
-
-
-def build_classifier():
-    classifier = Sequential()
-    classifier.add(Dense(units=6, kernel_initializer='uniform',
-                         activation='relu', input_dim=19))
-    classifier.add(
-        Dense(units=6, kernel_initializer='uniform', activation='relu'))
-    classifier.add(
-        Dense(units=1, kernel_initializer='uniform', activation='sigmoid'))
-    classifier.compile(
-        optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    return classifier
-
-
-classifier = KerasClassifier(
-    build_fn=build_classifier, batch_size=10, epochs=100)
-accuracies = cross_val_score(estimator=classifier, X=X_train, y=y_train, cv=10)
-mean = accuracies.mean()
-variance = accuracies.std()
-# tunning ann
-
-
-
-def build_classifier(optimizer):
-    classifier = Sequential()
-    classifier.add(Dense(units=6, kernel_initializer='uniform',
-                         activation='relu', input_dim=19))
-    classifier.add(
-        Dense(units=6, kernel_initializer='uniform', activation='relu'))
-    classifier.add(
-        Dense(units=1, kernel_initializer='uniform', activation='sigmoid'))
-    classifier.compile(optimizer=optimizer,
-                       loss='binary_crossentropy', metrics=['accuracy'])
-    return classifier
-
-
-classifier = KerasClassifier(build_fn=build_classifier)
-parameters = {'batch_size': [25, 32],
-              'epochs': [100, 500],
-              'optimizer': ['adam', 'rmsprop']}
-grid_search = GridSearchCV(estimator=classifier,
-                           param_grid=parameters,
-                           scoring='accuracy',
-                           cv=10)
-grid_search = grid_search.fit(X_train, y_train)
-best_parameters = grid_search.best_params_
-best_accuracy = grid_search.best_score_
+        def tuning(self):
+            classifier = KerasClassifier(
+                build_fn=build_classifier, batch_size=10, epochs=100)
+            accuracies = cross_val_score(estimator=classifier, X=X_train, y=y_train, cv=10)
+            mean = accuracies.mean()
+            variance = accuracies.std()
+            classifier = KerasClassifier(build_fn=build_classifier)
+            parameters = {'batch_size': [25, 32],
+                        'epochs': [100, 500],
+                        'optimizer': ['adam', 'rmsprop']}
+            grid_search = GridSearchCV(estimator=classifier,
+                                    param_grid=parameters,
+                                    scoring='accuracy',
+                                    cv=10)
+            grid_search = grid_search.fit(X_train, y_train)
+            best_parameters = grid_search.best_params_
+            best_accuracy = grid_search.best_score_
 
 # Saving file to json (Javascript Object Notation)
 
