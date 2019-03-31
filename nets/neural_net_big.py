@@ -23,48 +23,42 @@ class NeuralNetworkBig:
         self.df = pd.read_csv('dataset/dataset-big.csv')
         self.X = self.df.iloc[:, 0:19].values
         self.y = df.iloc[:, 20]
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+                    self.X, self.y, test_size=0.2, random_state=0)
+        self.sc = StandardScaler()
+        self.X_train = sc.fit_transform(self.X_train)
+        self.X_test = sc.transform(self.X_test)
 
 
-df = pd.read_csv('dataset/dataset-big.csv')
-X = df.iloc[:, 0:19].values
-y = df.iloc[:, 20]
+        def build_classifier(self):
+            classifier = Sequential()
+            classifier.add(Dense(output_dim=6, init='uniform',
+                                activation='relu', input_dim=19))
+            classifier.add(Dense(output_dim=6, init='uniform', activation='relu'))
+            classifier.add(Dense(output_dim=1, init='uniform', activation='sigmoid'))
+            classifier.compile(
+                optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
+            classifier.fit(self.X_train, self.y_train, batch_size=10, nb_epoch=100)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=0)
+        def predict(self):
+            y_pred = classifier.predict(X_test)
+            for index, item in enumerate(y_pred):
+                if item >= 0.5:
+                    y_pred[index] = 1
+                else:
+                    y_pred[index] = 0
 
+            y_pred = np.array(y_pred, dtype=int)
+            y_pred = pd.Series(y_pred)
+            y_test = pd.Series(y_test)
 
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
+            y_pred = y_pred.reshape(634,)
 
-classifier = Sequential()
-classifier.add(Dense(output_dim=6, init='uniform',
-                     activation='relu', input_dim=19))
-classifier.add(Dense(output_dim=6, init='uniform', activation='relu'))
-classifier.add(Dense(output_dim=1, init='uniform', activation='sigmoid'))
-classifier.compile(
-    optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-
-classifier.fit(X_train, y_train, batch_size=10, nb_epoch=100)
-
-y_pred = classifier.predict(X_test)
-for index, item in enumerate(y_pred):
-    if item >= 0.5:
-        y_pred[index] = 1
-    else:
-        y_pred[index] = 0
-
-y_pred = np.array(y_pred, dtype=int)
-y_pred = pd.Series(y_pred)
-y_test = pd.Series(y_test)
-
-y_pred = y_pred.reshape(634,)
-
-count = 0
-for i in range(635):
-    if y_pred[i] == y_test[i]:
-        count = count+1
+            count = 0
+            for i in range(635):
+                if y_pred[i] == y_test[i]:
+                    count = count+1
 
 
 
