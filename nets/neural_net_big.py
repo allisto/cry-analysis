@@ -4,108 +4,84 @@ import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.models import model_from_json
-
-df = pd.read_csv('dataset/dataset-big.csv')
-X = df.iloc[:, 0:19].values
-y = df.iloc[:, 20]
-
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=0)
-
 from sklearn.preprocessing import StandardScaler
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
-
-classifier = Sequential()
-classifier.add(Dense(output_dim=6, init='uniform',
-                     activation='relu', input_dim=19))
-classifier.add(Dense(output_dim=6, init='uniform', activation='relu'))
-classifier.add(Dense(output_dim=1, init='uniform', activation='sigmoid'))
-classifier.compile(
-    optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-
-classifier.fit(X_train, y_train, batch_size=10, nb_epoch=100)
-
-y_pred = classifier.predict(X_test)
-for index, item in enumerate(y_pred):
-    if item >= 0.5:
-        y_pred[index] = 1
-    else:
-        y_pred[index] = 0
-
-y_pred = np.array(y_pred, dtype=int)
-y_pred = pd.Series(y_pred)
-y_test = pd.Series(y_test)
-
-y_pred = y_pred.reshape(634,)
-
-count = 0
-for i in range(635):
-    if y_pred[i] == y_test[i]:
-        count = count+1
-
-
 from sklearn.metrics import confusion_matrix
-cm = confusion_matrix(y_test, y_pred)
-
-# Evalutation of Model
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import cross_val_score
 from keras.models import Sequential
 from keras.layers import Dense
-
-
-def build_classifier():
-    classifier = Sequential()
-    classifier.add(Dense(units=6, kernel_initializer='uniform',
-                         activation='relu', input_dim=19))
-    classifier.add(
-        Dense(units=6, kernel_initializer='uniform', activation='relu'))
-    classifier.add(
-        Dense(units=1, kernel_initializer='uniform', activation='sigmoid'))
-    classifier.compile(
-        optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    return classifier
-
-
-classifier = KerasClassifier(
-    build_fn=build_classifier, batch_size=10, epochs=100)
-accuracies = cross_val_score(estimator=classifier, X=X_train, y=y_train, cv=10)
-mean = accuracies.mean()
-variance = accuracies.std()
-# tunning ann
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV
 from keras.models import Sequential
 from keras.layers import Dense
 
+class NeuralNetworkBig:
+    
 
-def build_classifier(optimizer):
-    classifier = Sequential()
-    classifier.add(Dense(units=6, kernel_initializer='uniform',
-                         activation='relu', input_dim=19))
-    classifier.add(
-        Dense(units=6, kernel_initializer='uniform', activation='relu'))
-    classifier.add(
-        Dense(units=1, kernel_initializer='uniform', activation='sigmoid'))
-    classifier.compile(optimizer=optimizer,
-                       loss='binary_crossentropy', metrics=['accuracy'])
-    return classifier
+    def __init__(self):
+        self.df = pd.read_csv('dataset/dataset-big.csv')
+        self.X = self.df.iloc[:, 0:19].values
+        self.y = df.iloc[:, 20]
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+                    self.X, self.y, test_size=0.2, random_state=0)
+        self.sc = StandardScaler()
+        self.X_train = sc.fit_transform(self.X_train)
+        self.X_test = sc.transform(self.X_test)
 
 
-classifier = KerasClassifier(build_fn=build_classifier)
-parameters = {'batch_size': [25, 32],
-              'epochs': [100, 500],
-              'optimizer': ['adam', 'rmsprop']}
-grid_search = GridSearchCV(estimator=classifier,
-                           param_grid=parameters,
-                           scoring='accuracy',
-                           cv=10)
-grid_search = grid_search.fit(X_train, y_train)
-best_parameters = grid_search.best_params_
-best_accuracy = grid_search.best_score_
+        def build_classifier(self):
+            classifier = Sequential()
+            classifier.add(Dense(output_dim=6, init='uniform',
+                                activation='relu', input_dim=19))
+            classifier.add(Dense(output_dim=6, init='uniform', activation='relu'))
+            classifier.add(Dense(output_dim=1, init='uniform', activation='sigmoid'))
+            classifier.compile(
+                optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+            classifier.fit(self.X_train, self.y_train, batch_size=10, nb_epoch=100)
+
+            return classifier
+
+        def predict(self):
+            y_pred = classifier.predict(X_test)
+            for index, item in enumerate(y_pred):
+                if item >= 0.5:
+                    y_pred[index] = 1
+                else:
+                    y_pred[index] = 0
+
+            y_pred = np.array(y_pred, dtype=int)
+            y_pred = pd.Series(y_pred)
+            y_test = pd.Series(y_test)
+
+            y_pred = y_pred.reshape(634,)
+
+            count = 0
+            for i in range(635):
+                if y_pred[i] == y_test[i]:
+                    count = count+1
+
+            cm = confusion_matrix(y_test, y_pred)
+
+
+        def tuning(self):
+            classifier = KerasClassifier(
+                build_fn=build_classifier, batch_size=10, epochs=100)
+            accuracies = cross_val_score(estimator=classifier, X=X_train, y=y_train, cv=10)
+            mean = accuracies.mean()
+            variance = accuracies.std()
+            classifier = KerasClassifier(build_fn=build_classifier)
+            parameters = {'batch_size': [25, 32],
+                        'epochs': [100, 500],
+                        'optimizer': ['adam', 'rmsprop']}
+            grid_search = GridSearchCV(estimator=classifier,
+                                    param_grid=parameters,
+                                    scoring='accuracy',
+                                    cv=10)
+            grid_search = grid_search.fit(X_train, y_train)
+            best_parameters = grid_search.best_params_
+            best_accuracy = grid_search.best_score_
 
 # Saving file to json (Javascript Object Notation)
 
