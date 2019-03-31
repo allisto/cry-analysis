@@ -4,23 +4,36 @@ import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.models import model_from_json
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import GridSearchCV
+from keras.models import Sequential
+from keras.layers import Dense
 
 class NeuralNetworkBig:
     
 
     def __init__(self):
-        pass
+        self.df = pd.read_csv('dataset/dataset-big.csv')
+        self.X = self.df.iloc[:, 0:19].values
+        self.y = df.iloc[:, 20]
 
 
 df = pd.read_csv('dataset/dataset-big.csv')
 X = df.iloc[:, 0:19].values
 y = df.iloc[:, 20]
 
-from sklearn.model_selection import train_test_split
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=0)
 
-from sklearn.preprocessing import StandardScaler
+
 sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
@@ -54,14 +67,11 @@ for i in range(635):
         count = count+1
 
 
-from sklearn.metrics import confusion_matrix
+
 cm = confusion_matrix(y_test, y_pred)
 
 # Evalutation of Model
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import cross_val_score
-from keras.models import Sequential
-from keras.layers import Dense
+
 
 
 def build_classifier():
@@ -83,10 +93,7 @@ accuracies = cross_val_score(estimator=classifier, X=X_train, y=y_train, cv=10)
 mean = accuracies.mean()
 variance = accuracies.std()
 # tunning ann
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import GridSearchCV
-from keras.models import Sequential
-from keras.layers import Dense
+
 
 
 def build_classifier(optimizer):
