@@ -5,6 +5,11 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.models import model_from_json
 
+class NeuralNetworkBig:
+    pass
+
+
+
 df = pd.read_csv('dataset/dataset-big.csv')
 X = df.iloc[:, 0:19].values
 y = df.iloc[:, 20]
